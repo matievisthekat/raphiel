@@ -5,7 +5,6 @@ import { PermissionString } from "discord.js";
 import { GuildMember } from "discord.js";
 import Level from "../models/Level";
 import LevelRole from "../models/LevelRole";
-import { Mongoose } from "mongoose";
 
 export default class Ready extends CustomEvent {
   constructor(client: Bot) {
@@ -62,7 +61,7 @@ export default class Ready extends CustomEvent {
       const roles = await LevelRole.find();
       const role = roles.filter((r) => data.level >= r.level).sort((a, b) => b.level - a.level)[0];
 
-      await msg.member.roles.add(role.id).catch(() => {});
+      if (role) await msg.member.roles.add(role.id).catch(() => {});
     }
   }
 }

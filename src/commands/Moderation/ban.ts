@@ -1,4 +1,4 @@
-import { Command, Arg, Bot, CommandRunOptions, CommandResult } from "../../../lib";
+import { Command, Arg, Bot, CommandRunOptions, CommandResult, Util } from "../../../lib";
 import { Message, GuildMember } from "discord.js";
 
 export default class extends Command {
@@ -29,10 +29,12 @@ export default class extends Command {
   public async run(msg: Message, { args }: CommandRunOptions): Promise<CommandResult | Message> {
     const target = (await msg.client.getUserOrMember(args[0], msg.guild)) as GuildMember;
     if (!target) return msg.send("warn", "No target found");
+    const reason = args.slice(1).join(" ");
 
     try {
-      await target.ban({ reason: args.slice(1).join(" ") });
-      await msg.send("success", `Banned ${target} for: \`${args.slice(1).join(" ")}\``);
+      await target.ban({ reason });
+      await msg.send("success", `Banned ${target} for: \`${reason}\``);
+      await Util.modlog("ban", target, msg.member, msg.client, reason);
     } catch (err) {
       await msg.send("warn", `Unable to ban that member: ${err.message}`);
     }

@@ -1,4 +1,4 @@
-import { ExecuteResult, Arg, ModLog, Bot } from "../";
+import { ExecuteResult, Arg, ModLog } from "../";
 import { promisify } from "util";
 import { exec } from "child_process";
 import * as fs from "fs";
@@ -148,7 +148,7 @@ export class Util {
     type: ModLog,
     target: GuildMember,
     author: GuildMember,
-    client: Bot,
+    client: Client,
     reason?: string | void,
     duration?: number | void
   ) {

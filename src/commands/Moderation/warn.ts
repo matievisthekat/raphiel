@@ -1,4 +1,4 @@
-import { Command, Arg, Bot, CommandRunOptions, CommandResult } from "../../../lib";
+import { Command, Arg, Bot, CommandRunOptions, CommandResult, Util } from "../../../lib";
 import { Message, GuildMember } from "discord.js";
 
 export default class extends Command {
@@ -28,14 +28,16 @@ export default class extends Command {
   public async run(msg: Message, { args }: CommandRunOptions): Promise<CommandResult | Message> {
     const target = (await msg.client.getUserOrMember(args[0], msg.guild)) as GuildMember;
     if (!target) return msg.send("warn", "No target found");
+    const reason = args.slice(1).join(" ");
 
     await msg.send(
       "warn",
-      `You have been warned by ${msg.author} in **${msg.guild.name}** for: \`${args.slice(1).join(" ")}\``,
+      `You have been warned by ${msg.author} in **${msg.guild.name}** for: \`${reason}\``,
       target.user.dmChannel || (await target.user.createDM())
     );
-    
-    await msg.send("success", `Warned ${target.user.tag} for: \`${args.slice(1).join(" ")}\``);
+    await Util.modlog("mute", target, msg.member, msg.client, reason);
+
+    await msg.send("success", `Warned ${target.user.tag} for: \`${reason}\``);
     return { done: true };
   }
 }

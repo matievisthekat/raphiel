@@ -1,4 +1,4 @@
-import { Command, Arg, Bot, CommandRunOptions, CommandResult } from "../../../lib";
+import { Command, Arg, Bot, CommandRunOptions, CommandResult, Util } from "../../../lib";
 import { Message } from "discord.js";
 import { GuildMember } from "discord.js";
 import ms from "ms";
@@ -45,6 +45,8 @@ export default class extends Command {
       setTimeout(async () => await target.roles.remove(role), timeout);
 
       await msg.send("success", `Muted ${target.user.tag} for ${ms(timeout, { long: true })}`);
+
+      await Util.modlog("mute", target, msg.member, msg.client, null, timeout);
     } catch (err) {
       msg.client.logger.error(err);
       await msg.send("warn", `Failed to mute the member: ${err.message}`);

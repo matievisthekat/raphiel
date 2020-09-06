@@ -4,7 +4,7 @@ import { exec } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import config from "../../src/config";
-import { MessageReaction, User, GuildMember, TextChannel, MessageEmbed } from "discord.js";
+import { MessageReaction, User, GuildMember, TextChannel, MessageEmbed, Client } from "discord.js";
 import ReactionRole from "../../src/models/ReactionRole";
 import ms from "ms";
 

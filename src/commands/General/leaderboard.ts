@@ -29,7 +29,7 @@ export default class extends Command {
     const levels = (await Level.find()).sort((a, b) => b.xp - a.xp).slice(0, 10);
     await msg.send(
       "success",
-      new MessageEmbed().setDescription(
+      new msg.client.Embed().setDescription(
         levels.map((l, i) => `**${i + 1}** - <@${l.uid}> - *Level ${l.level}, ${l.xp} xp*`).join("\n")
       )
     );

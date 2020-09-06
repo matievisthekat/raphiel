@@ -10,6 +10,8 @@ export interface ArgOptions {
   required?: boolean;
 }
 
+export type ModLog = "warn" | "mute" | "kick" | "ban";
+
 export interface DatabaseOptions {
   options: ConnectionOptions;
   host: string;

@@ -1,11 +1,12 @@
-import { ExecuteResult, Arg } from "../";
+import { ExecuteResult, Arg, ModLog, Bot } from "../";
 import { promisify } from "util";
 import { exec } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import config from "../../src/config";
-import { MessageReaction, User } from "discord.js";
+import { MessageReaction, User, GuildMember, TextChannel, MessageEmbed } from "discord.js";
 import ReactionRole from "../../src/models/ReactionRole";
+import ms from "ms";
 
 const realExec = promisify(exec);
 
@@ -86,7 +87,7 @@ export class Util {
    * @public
    * @static
    */
-  public static findNested(dir: string, pattern = "js"): Array<string> {
+  public static findNested(dir: string, pattern: string = "js"): Array<string> {
     let results: Array<string> = [];
 
     fs.readdirSync(dir).forEach((innerDir) => {
@@ -141,5 +142,35 @@ export class Util {
         )
       );
     });
+  }
+
+  public static async modlog(
+    type: ModLog,
+    target: GuildMember,
+    author: GuildMember,
+    client: Bot,
+    reason?: string | void,
+    duration?: number | void
+  ) {
+    const colours: Record<ModLog, string> = {
+      warn: "",
+      mute: "",
+      kick: "",
+      ban: "",
+    };
+
+    const embed = new MessageEmbed()
+      .setColor(colours[type])
+      .setAuthor(`${Util.capitalise(type)}: ${target.user.tag} (${target.user.id})`)
+      .setDescription(
+        `By: ${author} (${author.user.tag})${reason ? `\nReason: \`${reason}\`` : ""}${
+          duration ? `\nDuration: ${ms(duration, { long: true })}` : ""
+        }`
+      )
+      .setTimestamp();
+
+    const chan = client.channels.cache.get(process.env["modlogs.channel.id"]) as TextChannel;
+    if (chan) await chan.send(embed);
+    else client.logger.warn("Modlog channel not found");
   }
 }

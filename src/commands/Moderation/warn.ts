@@ -1,5 +1,6 @@
 import { Command, Arg, Bot, CommandRunOptions, CommandResult, Util } from "../../../lib";
 import { Message, GuildMember } from "discord.js";
+import User from "../../models/User";
 
 export default class extends Command {
   constructor(client: Bot) {
@@ -36,6 +37,14 @@ export default class extends Command {
       target.user.dmChannel || (await target.user.createDM())
     );
     await Util.modlog("mute", target, msg.member, msg.client, reason);
+    const data = (await User.findOne({ id: target.user.id })) || new User({ id: target.user.id });
+    data.infractions.push({
+      authorID: msg.author.id,
+      timestamp: new Date().toDateString(),
+      type: "warn",
+      reason,
+    });
+    await data.save();
 
     await msg.send("success", `Warned ${target.user.tag} for: \`${reason}\``);
     return { done: true };

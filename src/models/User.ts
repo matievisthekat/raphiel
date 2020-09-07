@@ -1,18 +1,26 @@
 import Mongoose from "mongoose";
-import { resolve } from "path";
+import { ModLog } from "../../lib";
 
 export interface User extends Mongoose.Document {
   id: string;
   developer: boolean;
   bgUrl: string;
   desc: string;
+  infractions: Infraction[];
+}
+
+interface Infraction {
+  timestamp: string;
+  authorID: string;
+  type: ModLog;
+  reason?: string;
 }
 
 export default Mongoose.model<User>(
   "User",
   new Mongoose.Schema({
     id: { required: true, type: String },
-    developer: { default: false, type: Boolean },
+    developer: { required: false, default: false, type: Boolean },
     bgUrl: {
       required: false,
       default:
@@ -20,5 +28,6 @@ export default Mongoose.model<User>(
       type: String,
     },
     desc: { required: false, default: "No description set", type: String },
+    infractions: { required: false, default: [], type: Array },
   })
 );

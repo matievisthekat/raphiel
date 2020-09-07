@@ -1,5 +1,6 @@
 import { Command, Arg, Bot, CommandRunOptions, CommandResult, Util } from "../../../lib";
 import { Message, GuildMember } from "discord.js";
+import User from "../../models/User";
 
 export default class extends Command {
   constructor(client: Bot) {
@@ -33,6 +34,15 @@ export default class extends Command {
 
     try {
       await target.ban({ reason });
+      const data = (await User.findOne({ id: target.user.id })) || new User({ id: target.user.id });
+      data.infractions.push({
+        authorID: msg.author.id,
+        timestamp: new Date().toDateString(),
+        type: "ban",
+        reason,
+      });
+      await data.save();
+
       await msg.send("success", `Banned ${target} for: \`${reason}\``);
       await Util.modlog("ban", target, msg.member, msg.client, reason);
     } catch (err) {

@@ -2,6 +2,7 @@ import { Command, Arg, Bot, CommandRunOptions, CommandResult, Util } from "../..
 import { Message } from "discord.js";
 import { GuildMember } from "discord.js";
 import ms from "ms";
+import User from "../../models/User";
 
 export default class extends Command {
   constructor(client: Bot) {
@@ -41,6 +42,13 @@ export default class extends Command {
 
     try {
       await target.roles.add(role);
+      const data = (await User.findOne({ id: target.user.id })) || new User({ id: target.user.id });
+      data.infractions.push({
+        authorID: msg.author.id,
+        timestamp: new Date().toDateString(),
+        type: "mute",
+      });
+      await data.save();
 
       setTimeout(async () => await target.roles.remove(role), timeout);
 
